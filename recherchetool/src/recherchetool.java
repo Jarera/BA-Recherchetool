@@ -447,7 +447,7 @@ public class recherchetool {
 	
 	public String sparqlQuery(String queryString){
 		String resultString;
-		FileManager.get().addLocatorClassLoader(Main.class.getClassLoader());
+		FileManager.get().addLocatorClassLoader(recherchetool.class.getClassLoader());
 		
 		// Für Online SPARQL Endpoint
 		Query query = QueryFactory.create(queryString);
