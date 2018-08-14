@@ -1,0 +1,60 @@
+import java.util.Iterator;
+
+import org.apache.jena.query.Query;
+import org.apache.jena.query.QueryExecution;
+import org.apache.jena.query.QueryExecutionFactory;
+import org.apache.jena.query.QueryFactory;
+import org.apache.jena.query.QuerySolution;
+import org.apache.jena.query.ResultSet;
+import org.apache.jena.query.ResultSetFormatter;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.util.FileManager;
+
+public class Main{
+	public static void main(String args[]){
+		sparqlTest();
+	}
+	
+	static void sparqlTest(){
+		FileManager.get().addLocatorClassLoader(Main.class.getClassLoader());
+		//Model model = FileManager.get().loadModel("./beitragsbeschreibung.ttl");
+		
+		String queryString = 
+		/*"PREFIX page: <live.dbpedia.org/page/>" +
+		"PREFIX category: <live.dbpedia.org/page/Category:>" +
+		"PREFIX ontology: <http://dbpedia.org/ontology/>" +
+
+		"SELECT ?seasons ?gp WHERE {" +
+		"category:Formula_One_races ?broader ?seasons ." +
+		"?seasons ?subect ?gp ." +
+		"?gp ontology:firstDriverTeam page:Scuderia_Ferrari ." +
+		"?gp ontology:secondTeam page:Mercedes-Benz_in_Formula_One ." +
+		"?gp ontology:thirdTeam page:Mercedes-Benz_in_Formula_One . }";
+		*/
+		"select ?place where {" +
+		"<http://live.dbpedia.org/page/Tom_Hanks> <http://live.dbpedia.org/ontology/birthPlace> ?place . }";
+		
+		// Für Online SPARQL Endpoint
+		Query query = QueryFactory.create(queryString);
+		QueryExecution qexec = QueryExecutionFactory.sparqlService("http://live.dbpedia.org/sparql/", query);
+
+		ResultSet results = qexec.execSelect();
+		ResultSetFormatter.out(System.out, results, query);
+		
+		qexec.close();
+		
+		
+		// Für lokale .ttl Datei
+				/*
+				Query query = QueryFactory.create(queryString);
+				QueryExecution qexec = QueryExecutionFactory.create(query, model);
+				
+				ResultSet results = qexec.execSelect();
+				while(results.hasNext()){
+					QuerySolution soln = results.nextSolution();
+					System.out.println(soln);
+				}
+				qexec.close();
+				*/
+	}
+}

@@ -1,0 +1,160 @@
+import java.awt.EventQueue;
+import javax.swing.JFrame;
+import javax.swing.JTextField;
+import java.awt.BorderLayout;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JButton;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
+import org.apache.jena.query.Query;
+import org.apache.jena.query.QueryExecution;
+import org.apache.jena.query.QueryExecutionFactory;
+import org.apache.jena.query.QueryFactory;
+import org.apache.jena.query.QuerySolution;
+import org.apache.jena.query.ResultSet;
+import org.apache.jena.query.ResultSetFormatter;
+import org.apache.jena.util.FileManager;
+import javax.swing.JTextArea;
+
+public class recherchetool {
+
+	private JFrame frame;
+	private JTextField textField_subject;
+	private JTextField textField_predicate;
+	private JTextField textField_object;
+	private JTextField textField_questionWord;
+	private JLabel lable_result;
+	private JTextArea textArea;
+
+	/**
+	 * Launch the application.
+	 */
+	public static void main(String[] args) {
+		EventQueue.invokeLater(new Runnable() {
+			public void run() {
+				try {
+					recherchetool window = new recherchetool();
+					window.frame.setVisible(true);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
+	}
+
+	/**
+	 * Create the application.
+	 */
+	public recherchetool() {
+		initialize();
+	}
+
+	/**
+	 * Initialize the contents of the frame.
+	 */
+	private void initialize() {
+		frame = new JFrame();
+		frame.setBounds(100, 100, 1006, 721);
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.getContentPane().setLayout(null);
+		
+		textField_subject = new JTextField();
+		textField_subject.setBounds(15, 42, 248, 34);
+		frame.getContentPane().add(textField_subject);
+		textField_subject.setColumns(6);
+		
+		textField_predicate = new JTextField();
+		textField_predicate.setColumns(6);
+		textField_predicate.setBounds(278, 42, 263, 34);
+		frame.getContentPane().add(textField_predicate);
+		
+		textField_object = new JTextField();
+		textField_object.setColumns(6);
+		textField_object.setBounds(556, 42, 238, 34);
+		frame.getContentPane().add(textField_object);
+		
+		JLabel lable_subject = new JLabel("Subjekt");
+		lable_subject.setBounds(15, 16, 69, 20);
+		frame.getContentPane().add(lable_subject);
+		
+		JLabel lable_predicat = new JLabel("Pr\u00E4dikat");
+		lable_predicat.setBounds(278, 16, 69, 20);
+		frame.getContentPane().add(lable_predicat);
+		
+		JLabel lable_object = new JLabel("Objekt");
+		lable_object.setBounds(556, 16, 69, 20);
+		frame.getContentPane().add(lable_object);
+		
+		textField_questionWord = new JTextField();
+		textField_questionWord.setColumns(6);
+		textField_questionWord.setBounds(15, 133, 248, 34);
+		frame.getContentPane().add(textField_questionWord);
+		
+		JLabel lable_QuestionWord = new JLabel("Question Word");
+		lable_QuestionWord.setBounds(15, 108, 114, 20);
+		frame.getContentPane().add(lable_QuestionWord);
+		
+		lable_result = new JLabel("Result");
+		lable_result.setBounds(15, 183, 114, 20);
+		frame.getContentPane().add(lable_result);
+		
+		textArea = new JTextArea();
+		textArea.setBounds(15, 204, 954, 445);
+		frame.getContentPane().add(textArea);
+		
+		JButton btnQuery = new JButton("Query");
+		btnQuery.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				String subject, object, predicate;
+				String queryString;
+				try {
+					subject = textField_subject.getText();
+					predicate = textField_predicate.getText();
+					object = textField_object.getText();
+					
+					//queryString = subject + predicate + object;
+					queryString = subject;
+					textArea.setText(sparqlQuery(queryString));
+					
+				} catch(Exception e){
+					JOptionPane.showMessageDialog(null, "Bitte pruefe deine Eingabe nochmal");
+				}
+			}
+		});
+		btnQuery.setBounds(278, 133, 134, 34);
+		frame.getContentPane().add(btnQuery);
+		
+	}
+
+
+	public String sparqlQuery(String queryString){
+		String resultString;
+		
+		FileManager.get().addLocatorClassLoader(Main.class.getClassLoader());
+		
+		// Für Online SPARQL Endpoint
+		Query query = QueryFactory.create(queryString);
+		QueryExecution qexec = QueryExecutionFactory.sparqlService("http://live.dbpedia.org/sparql/", query);
+
+		ResultSet results = qexec.execSelect();
+		resultString = ResultSetFormatter.asText(results, query);
+		//ResultSetFormatter.out(textArea, results, query);
+		/*
+		resultString = ResultSetFormatter.toList(results).toString();
+		List<QuerySolution> querySolution = ResultSetFormatter.toList(results);
+		List<String> resultList = new ArrayList<String>();
+		
+		for(QuerySolution qs:querySolution){
+			resultList.add(qs.toString());
+		}
+		*/
+		qexec.close();
+		
+		return resultString;
+	}
+}

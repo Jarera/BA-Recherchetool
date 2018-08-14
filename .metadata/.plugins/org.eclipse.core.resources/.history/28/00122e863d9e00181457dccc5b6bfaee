@@ -1,0 +1,287 @@
+import java.awt.EventQueue;
+import javax.swing.JFrame;
+import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
+
+import java.awt.BorderLayout;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.JButton;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.awt.event.ActionEvent;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
+import org.apache.jena.query.Query;
+import org.apache.jena.query.QueryExecution;
+import org.apache.jena.query.QueryExecutionFactory;
+import org.apache.jena.query.QueryFactory;
+import org.apache.jena.query.QuerySolution;
+import org.apache.jena.query.ResultSet;
+import org.apache.jena.query.ResultSetFormatter;
+import org.apache.jena.util.FileManager;
+import javax.swing.JTextArea;
+import javax.swing.JComboBox;
+
+public class recherchetool {
+
+	private JFrame frame;
+	private JLabel lable_result;
+	private JTextArea textArea;
+	private JComboBox researchTarget;
+	private JComboBox researchRestriction1_1;
+	private JComboBox researchRestriction1_2;
+
+	/**
+	 * Launch the application.
+	 */
+	public static void main(String[] args) {
+		EventQueue.invokeLater(new Runnable() {
+			public void run() {
+				try {
+					recherchetool window = new recherchetool();
+					window.frame.setVisible(true);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
+	}
+
+	/**
+	 * Create the application.
+	 */
+	public recherchetool() {
+		initialize();
+	}
+
+	/**
+	 * Initialize the contents of the frame.
+	 */
+	private void initialize() {
+		frame = new JFrame();
+		frame.setBounds(100, 100, 1258, 923);
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.getContentPane().setLayout(null);
+		
+		lable_result = new JLabel("Result");
+		lable_result.setBounds(15, 320, 114, 20);
+		frame.getContentPane().add(lable_result);
+		
+		textArea = new JTextArea();
+		textArea.setBounds(15, 346, 1206, 505);
+		frame.getContentPane().add(textArea);
+		
+		JButton btnQuery = new JButton("Query");
+		btnQuery.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				String queryString;
+				try {
+					queryString = buildSparqlQuery(researchTarget.getSelectedItem(), researchRestriction1_1.getSelectedItem(), researchRestriction1_2.getSelectedItem());		
+					textArea.setText(sparqlQuery(queryString));
+				} catch(Exception e){
+					JOptionPane.showMessageDialog(null, "Bitte pruefe deine Eingabe nochmal");
+				}
+				
+			}
+		});
+		btnQuery.setBounds(15, 279, 134, 34);
+		frame.getContentPane().add(btnQuery);
+		
+		researchTarget = new JComboBox();
+		researchRestriction1_1 = new JComboBox();
+		researchRestriction1_2 = new JComboBox();
+		researchRestriction1_2.setEditable(true);
+		
+		researchTarget.setBounds(15, 42, 219, 26);
+		researchRestriction1_1.setBounds(246, 42, 219, 26);
+		researchRestriction1_2.setBounds(480, 42, 219, 26);
+		
+		frame.getContentPane().add(researchTarget);
+		frame.getContentPane().add(researchRestriction1_1);
+		frame.getContentPane().add(researchRestriction1_2);
+		
+		researchTarget.setEditable(true);
+		researchRestriction1_1.setEditable(true);
+		researchRestriction1_1.setEditable(true);
+		
+		final JTextField researchTargetText = (JTextField)     researchTarget.getEditor().getEditorComponent();
+		researchTargetText.addKeyListener(new KeyAdapter() {
+	        public void keyReleased(KeyEvent ke) {
+	            SwingUtilities.invokeLater(new Runnable() {
+	                public void run() {
+	                    comboFilter(researchTargetText.getText(), 1);
+	                }
+	            });
+	        }
+	    });
+		final JTextField researchRestriction1_1Text = (JTextField)     researchRestriction1_1.getEditor().getEditorComponent();
+		researchRestriction1_1Text.addKeyListener(new KeyAdapter() {
+	        public void keyReleased(KeyEvent ke) {
+	            SwingUtilities.invokeLater(new Runnable() {
+	                public void run() {
+	                    comboFilter(researchRestriction1_1Text.getText(), 2);
+	                }
+	            });
+	        }
+	    });
+		final JTextField researchRestriction1_2Text = (JTextField)     researchRestriction1_2.getEditor().getEditorComponent();
+		researchRestriction1_2Text.addKeyListener(new KeyAdapter() {
+	        public void keyReleased(KeyEvent ke) {
+	            SwingUtilities.invokeLater(new Runnable() {
+	                public void run() {
+	                    comboFilter(researchRestriction1_2Text.getText(), 3);
+	                }
+	            });
+	        }
+	    });
+	}
+
+	public void comboFilter(String enteredText, int id) {
+	    List<String> filterArray= new ArrayList<String>();
+	    List<String> vocabular = new ArrayList<>(20);
+		vocabular.add("Scuderia Ferrari");
+		vocabular.add("Mercedes");
+		vocabular.add("Red Bull");
+		vocabular.add("Alle Grand Prix");
+		vocabular.add("Austragungsort");
+		vocabular.add("Deutschland");
+	     try
+	    {
+	    for(int i=0; i<vocabular.size(); i++){
+	    	if(vocabular.get(i).contains(enteredText)){
+	    		filterArray.add(vocabular.get(i));
+	    	}
+	    }
+	 
+	    }
+	    catch(Exception ex)
+	    {
+	     System.out.println("error"+ex);   
+	    }
+
+
+
+	    if(id == 1){
+	    	if (filterArray.size() > 0) {
+	    		researchTarget.setModel(new DefaultComboBoxModel(filterArray.toArray()));
+	    		researchTarget.setSelectedItem(enteredText);
+	    		researchTarget.showPopup();
+	    	}
+	    	else {
+	    		researchTarget.hidePopup();
+	    	}
+	    }
+	    if(id == 2){
+	    	if (filterArray.size() > 0) {
+	    		researchRestriction1_1.setModel(new DefaultComboBoxModel(filterArray.toArray()));
+	    		researchRestriction1_1.setSelectedItem(enteredText);
+	    		researchRestriction1_1.showPopup();
+	    	}
+	    	else {
+	    		researchRestriction1_1.hidePopup();
+	    	}
+	    }
+	    if(id == 3){
+	    	if (filterArray.size() > 0) {
+	    		researchRestriction1_2.setModel(new DefaultComboBoxModel(filterArray.toArray()));
+	    		researchRestriction1_2.setSelectedItem(enteredText);
+	    		researchRestriction1_2.showPopup();
+	    	}
+	    	else {
+	    		researchRestriction1_2.hidePopup();
+	    	}
+	    }
+	}
+
+	
+	public String sparqlQuery(String queryString){
+		String resultString;
+		FileManager.get().addLocatorClassLoader(Main.class.getClassLoader());
+		
+		// Für Online SPARQL Endpoint
+		Query query = QueryFactory.create(queryString);
+		QueryExecution qexec = QueryExecutionFactory.sparqlService("http://live.dbpedia.org/sparql/", query);
+
+		ResultSet results = qexec.execSelect();
+		resultString = ResultSetFormatter.asText(results, query);
+		
+		qexec.close();
+		
+		return resultString;
+	}
+	
+	
+	public String buildSparqlQuery(Object target, Object restriction1_1, Object restriction1_2){
+		String queryString = "PREFIX dbc: <http://dbpedia.org/resource/Category:> " +
+				"PREFIX dbo: <http://dbpedia.org/ontology/> " +
+				"PREFIX dbr: <http://dbpedia.org/resource/> " +
+				"PREFIX skos: <http://www.w3.org/2004/02/skos/core#> " +
+				"PREFIX dct: <http://purl.org/dc/terms/> " +
+				"PREFIX dbp: <http://dbpedia.org/property/> ";
+		JSONObject jsonObject = new JSONObject();
+		JSONObject tempObject = new JSONObject();
+		JSONArray bausteine = new JSONArray();
+		
+		// JSON laden
+		try{
+			JSONParser parser = new JSONParser();
+			Object obj = parser.parse(new FileReader("src/vokabular.json"));
+			jsonObject =  (JSONObject) obj;
+
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+		System.out.println("JSON geladen");
+		bausteine = (JSONArray) jsonObject.get("vokabular");
+		
+		//Eingabe des Benutzers in SPARQL-Fragment umwandeln
+		for(int i = 0; i<bausteine.size(); i++){
+			tempObject = (JSONObject) bausteine.get(i);
+			if (tempObject.get("id").toString().equals(target.toString())){
+				
+				System.out.println(tempObject.get("id").toString());
+				queryString = queryString.concat(tempObject.get("code").toString());
+			}
+		}
+		for(int i = 0; i<bausteine.size(); i++){
+			tempObject = (JSONObject) bausteine.get(i);
+			if (tempObject.get("id").toString().equals(restriction1_1.toString())){
+				
+				System.out.println(tempObject.get("id").toString());
+				queryString = queryString.concat(tempObject.get("code").toString());
+			}
+		}
+		for(int i = 0; i<bausteine.size(); i++){
+			tempObject = (JSONObject) bausteine.get(i);
+			if (tempObject.get("id").toString().equals(restriction1_2.toString())){
+				
+				System.out.println(tempObject.get("id").toString());
+				queryString = queryString.concat(tempObject.get("code").toString());
+			}
+		}
+		
+		
+		String sortingCode = "ORDER BY DESC(?year)";
+		
+		queryString = queryString.concat("}");
+		System.out.println(queryString);
+		
+		return queryString;
+	}
+}

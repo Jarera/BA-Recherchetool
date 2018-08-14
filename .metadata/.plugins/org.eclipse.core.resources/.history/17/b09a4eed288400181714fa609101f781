@@ -1,0 +1,65 @@
+import java.util.Iterator;
+
+import org.apache.jena.query.Query;
+import org.apache.jena.query.QueryExecution;
+import org.apache.jena.query.QueryExecutionFactory;
+import org.apache.jena.query.QueryFactory;
+import org.apache.jena.query.QuerySolution;
+import org.apache.jena.query.ResultSet;
+import org.apache.jena.query.ResultSetFormatter;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.util.FileManager;
+
+public class Main{
+	public static void main(String args[]){
+		sparqlTest();
+	}
+	
+	static void sparqlTest(){
+		FileManager.get().addLocatorClassLoader(Main.class.getClassLoader());
+		//Model model = FileManager.get().loadModel("./beitragsbeschreibung.ttl");
+		
+		String queryString = 
+		"PREFIX dbc: <http://dbpedia.org/page/Category:>" +
+		"PREFIX dbo: <http://dbpedia.org/ontology/>" +
+		"PREFIX dbr: <http://dbpedia.org/page/>" +
+		"PREFIX skos: <http://www.w3.org/2009/08/skos-reference/skos.html#>" +
+		"PREFIX dct: <http://purl.org/dc/terms/>" +
+		
+		"SELECT ?seasons ?gp WHERE {" +
+		"?seasons skos:broader dbc:Formula_One_races ." +
+		"?gp dct:subject ?seasons ." +
+		"?gp dbo:firstDriverTeam dbr:Scuderia_Ferrari ." +
+		"?gp dbo:secondTeam dbr:Mercedes-Benz_in_Formula_One ." +
+		"?gp dbo:thirdTeam dbr:Mercedes-Benz_in_Formula_One . }";
+		
+		/*
+		"PREFIX page: <http://live.dbpedia.org/page/>" +
+		"PREFIX ontology: <http://live.dbpedia.org/ontology/>" +
+		"select ?place where {" +
+		"dbr:Tom_Hanks dbo:birthPlace ?place . }";
+		*/
+		// Für Online SPARQL Endpoint
+		Query query = QueryFactory.create(queryString);
+		QueryExecution qexec = QueryExecutionFactory.sparqlService("http://dbpedia.org/sparql/", query);
+
+		ResultSet results = qexec.execSelect();
+		ResultSetFormatter.out(System.out, results, query);
+		
+		qexec.close();
+		
+		
+		// Für lokale .ttl Datei
+				/*
+				Query query = QueryFactory.create(queryString);
+				QueryExecution qexec = QueryExecutionFactory.create(query, model);
+				
+				ResultSet results = qexec.execSelect();
+				while(results.hasNext()){
+					QuerySolution soln = results.nextSolution();
+					System.out.println(soln);
+				}
+				qexec.close();
+				*/
+	}
+}

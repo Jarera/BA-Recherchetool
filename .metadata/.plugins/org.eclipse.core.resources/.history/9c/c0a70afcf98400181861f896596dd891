@@ -1,0 +1,123 @@
+import java.awt.EventQueue;
+
+import javax.swing.JFrame;
+import javax.swing.JTextField;
+import java.awt.BorderLayout;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JButton;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
+
+public class recherchetool {
+
+	private JFrame frame;
+	private JTextField textField_subject;
+	private JTextField textField_predicate;
+	private JTextField textField_object;
+	private JTextField textField_questionWord;
+	private JTextField textField_result;
+	private JLabel lable_result;
+
+	/**
+	 * Launch the application.
+	 */
+	public static void main(String[] args) {
+		EventQueue.invokeLater(new Runnable() {
+			public void run() {
+				try {
+					recherchetool window = new recherchetool();
+					window.frame.setVisible(true);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
+	}
+
+	/**
+	 * Create the application.
+	 */
+	public recherchetool() {
+		initialize();
+	}
+
+	/**
+	 * Initialize the contents of the frame.
+	 */
+	private void initialize() {
+		frame = new JFrame();
+		frame.setBounds(100, 100, 831, 461);
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.getContentPane().setLayout(null);
+		
+		textField_subject = new JTextField();
+		textField_subject.setBounds(15, 66, 248, 34);
+		frame.getContentPane().add(textField_subject);
+		textField_subject.setColumns(6);
+		
+		textField_predicate = new JTextField();
+		textField_predicate.setColumns(6);
+		textField_predicate.setBounds(278, 66, 263, 34);
+		frame.getContentPane().add(textField_object);
+		
+		textField_object = new JTextField();
+		textField_object.setColumns(6);
+		textField_object.setBounds(556, 66, 238, 34);
+		frame.getContentPane().add(textField_object);
+		/*
+		JLabel lable_subject = new JLabel("Subjekt");
+		lable_subject.setBounds(15, 40, 69, 20);
+		frame.getContentPane().add(lable_subject);
+		
+		JLabel lable_predicat = new JLabel("Pr\u00E4dikat");
+		lable_predicat.setBounds(278, 40, 69, 20);
+		frame.getContentPane().add(lable_predicat);
+		
+		JLabel lable_object = new JLabel("Objekt");
+		lable_object.setBounds(556, 40, 69, 20);
+		frame.getContentPane().add(lable_object);
+		
+		textField_questionWord = new JTextField();
+		textField_questionWord.setColumns(6);
+		textField_questionWord.setBounds(15, 163, 248, 34);
+		frame.getContentPane().add(textField_questionWord);
+		
+		JLabel lable_QuestionWord = new JLabel("Question Word");
+		lable_QuestionWord.setBounds(15, 139, 114, 20);
+		frame.getContentPane().add(lable_QuestionWord);
+		
+		textField_result = new JTextField();
+		textField_result.setColumns(6);
+		textField_result.setBounds(15, 289, 526, 34);
+		frame.getContentPane().add(textField_result);
+		
+		lable_result = new JLabel("Result");
+		lable_result.setBounds(15, 265, 114, 20);
+		frame.getContentPane().add(lable_result);
+		
+		JButton btnQuery = new JButton("Query");
+		/*
+		btnQuery.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				String subject, object, predicate;
+				String queryString;
+				try {
+					subject = textField_subject.getText();
+					predicate = textField_predicate.getText();
+					object = textField_object.getText();
+					
+					queryString = subject + predicate + object;
+					textField_result.setText(queryString);
+					
+				} catch(Exception e){
+					JOptionPane.showMessageDialog(null, "Bitte pruefe deine Eingabe nochmal");
+				}
+			}
+		});
+		*/
+		//btnQuery.setBounds(278, 163, 134, 34);
+		//frame.getContentPane().add(btnQuery);
+		
+	}
+}

@@ -1,0 +1,12 @@
+import java.util.Iterator;
+
+import com.hp.hpl.jena.query.Query;
+import com.hp.hpl.jena.query.QueryExecution;
+
+
+public class Main{
+	public static void main(String args[]){
+		
+	}
+	
+}

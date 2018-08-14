@@ -1,0 +1,43 @@
+import java.util.Iterator;
+
+import org.apache.jena.query.Query;
+import org.apache.jena.query.QueryExecution;
+import org.apache.jena.query.QueryExecutionFactory;
+import org.apache.jena.query.QueryFactory;
+import org.apache.jena.query.QuerySolution;
+import org.apache.jena.query.ResultSet;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.util.FileManager;
+
+public class Main{
+	public static void main(String args[]){
+		sparqlTest();
+	}
+	
+	static void sparqlTest(){
+		FileManager.get().addLocatorClassLoader(Main.class.getClassLoader());
+		Model model = FileManager.get().loadModel("C:/Users/Julian/Desktop/categories.ttl");
+		
+		String queryString = 
+				"PREFIX category: <http://de.dbpedia.org/resource/Kategorie:>" +
+				"PREFIX resource: <http://de.dbpedia.org/resource/>" +
+				"SELECT ?who WHERE { " +
+				"?who ?is category:Oscarpreisträger . " +
+				"?who ?is category:Frau . " +
+				"?who ?playedIn ?film . " +
+				"resource:Russell_Crowe ?playedIn ?film . }";
+		
+		Query query = QueryFactory.create(queryString);
+		QueryExecution qexec = QueryExecutionFactory.create(query, model);
+		try {
+			ResultSet results = qexec.execSelect();
+			while(results.hasNext()){
+				QuerySolution soln = results.nextSolution();
+				System.out.println(soln);
+			}
+		} finally {
+			qexec.close();
+		}
+			
+	}
+}

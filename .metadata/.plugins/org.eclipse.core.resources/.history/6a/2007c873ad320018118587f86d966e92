@@ -1,0 +1,50 @@
+import java.util.Iterator;
+
+import org.apache.jena.query.Query;
+import org.apache.jena.query.QueryExecution;
+import org.apache.jena.query.QueryExecutionFactory;
+import org.apache.jena.query.QueryFactory;
+import org.apache.jena.query.QuerySolution;
+import org.apache.jena.query.ResultSet;
+//import org.apache.jena.rdf.model.Model;
+//import org.apache.jena.util.FileManager;
+import org.apache.jena.query.ResultSetFormatter;
+
+public class Main{
+	public static void main(String args[]){
+		sparqlTest();
+	}
+	
+	static void sparqlTest(){
+		//FileManager.get().addLocatorClassLoader(Main.class.getClassLoader());
+		//Model model = FileManager.get().loadModel("C:/Users/Julian/Desktop/categories.ttl");
+		
+		String queryString = 
+			//	"PREFIX dbr: <http://de.dbpedia.org/resource/> PERSON
+			//	"PREFIX dbo: <http://dbpedia.org/ontology/>    ONTOLOGY
+				"PREFIX dct: <http://purl.org/dc/terms/> " +
+				"PREFIX category: <http://de.dbpedia.org/resource/Kategorie:> " +
+				
+				"SELECT ?who ?film WHERE { " +
+				"?who dct:subject category:Oscarpreisträger . " +
+				"?who dct:subject category:Frau . " +
+				"?film dbo:starring ?who . " +
+				"?film dbo:starring dbr:Russell_Crowe . }";
+		/*
+		String queryString = "SELECT ?who WHERE {"
+				+ "?who ?is <http://de.dbpedia.org/resource/Kategorie:Ministerpräsident_(Bayern)> . }";
+		*/
+		
+		Query query = QueryFactory.create(queryString);
+		
+		QueryExecution qexec = QueryExecutionFactory.sparqlService("http://de.dbpedia.org/sparql", query);
+
+		ResultSet results = qexec.execSelect();
+		ResultSetFormatter.out(System.out, results, query);
+		/*while(results.hasNext()){
+			QuerySolution soln = results.nextSolution();
+			System.out.println(soln);
+		}*/
+		qexec.close();
+	}
+}
